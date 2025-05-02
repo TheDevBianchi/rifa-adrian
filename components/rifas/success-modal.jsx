@@ -1,9 +1,10 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, X } from 'lucide-react'
+import { Check, X, Ticket, Receipt, CreditCard, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSettingsStore } from '@/store/use-settings-store'
+import CountryPrice from '@/components/ui/country-price'
 
 const SuccessModal = ({ isOpen, onClose, purchaseData, raffle }) => {
   const paymentMethod = useSettingsStore((state) =>
@@ -51,13 +52,13 @@ const SuccessModal = ({ isOpen, onClose, purchaseData, raffle }) => {
             initial={{ opacity: 0, y: 100, x: '-50%' }}
             animate={{ opacity: 1, y: '-50%', x: '-50%' }}
             exit={{ opacity: 0, y: 100 }}>
-            <div className='relative bg-gray-900 rounded-lg p-6 shadow-xl border border-gray-800'>
+            <div className='relative bg-gradient-to-br from-black to-gray-900 rounded-lg p-6 shadow-xl border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)]'>
               {/* Close button */}
               <button
-                onClick={onClose}
-                className='absolute right-4 top-4 text-gray-400 hover:text-white transition-colors'
+                onClick={() => onClose()}
+                className='absolute right-4 top-4 text-gray-400 hover:text-amber-400 transition-colors'
                 aria-label='Cerrar modal'>
-                <X className='h-6 w-6' />
+                <X className='h-5 w-5' />
               </button>
 
               {/* Success icon */}
@@ -69,45 +70,71 @@ const SuccessModal = ({ isOpen, onClose, purchaseData, raffle }) => {
                   stiffness: 260,
                   damping: 20,
                 }}
-                className='mx-auto w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-6'>
-                <Check className='h-8 w-8 text-green-500' />
+                className='mx-auto w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mb-6 border border-amber-500/30'>
+                <Check className='h-8 w-8 text-amber-500' />
               </motion.div>
 
               <div className='text-center mb-6'>
                 <h2
                   id='modal-title'
-                  className='text-xl font-semibold text-white mb-2'>
+                  className='text-xl font-bold bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent mb-2'>
                   ¡Reserva Exitosa!
                 </h2>
-                <p className='text-white'>
+                <p className='text-gray-300 text-sm'>
                   Tu reserva se ha realizado correctamente, envía tu comprobante
                   de pago a través del botón de WhatsApp.
                 </p>
               </div>
 
               <div className='space-y-4 mb-6'>
-                <div className='bg-gray-800/50 p-4 rounded-lg'>
-                  <h3 className='font-medium text-white mb-2'>
-                    Detalles de la compra:
+                {/* Resumen de tickets */}
+                <div className='bg-black/40 p-4 rounded-lg border border-amber-500/10'>
+                  <h3 className='font-medium text-amber-400 mb-2 flex items-center gap-2'>
+                    <Ticket className='h-4 w-4' />
+                    Detalles de la compra
                   </h3>
-                  <ul className='space-y-2 text-white'>
+                  <div className='space-y-2 text-gray-300'>
                     {!raffle.randomTickets ? (
-                      <li>
-                        Tickets: {purchaseData.selectedTickets.join(', ')}
-                      </li>
+                      <div className='flex justify-between'>
+                        <span className='text-gray-400'>Tickets seleccionados:</span>
+                        <span className='font-medium text-white'>{purchaseData.selectedTickets?.join(', ')}</span>
+                      </div>
                     ) : (
-                      <li>Sus tickets serán enviados por correo</li>
+                      <div className='flex justify-between'>
+                        <span className='text-gray-400'>Cantidad de tickets:</span>
+                        <span className='font-medium text-white'>{purchaseData.selectedTickets?.length}</span>
+                      </div>
                     )}
-                    <li>
-                      Total: $
-                      {(
-                        purchaseData.selectedTickets.length * raffle.price
-                      ).toFixed(2)}{' '}
-                      USD
-                    </li>
-                    <li>Método de pago: {purchaseData.paymentMethod}</li>
-                    <li>Referencia: {purchaseData.paymentReference}</li>
-                  </ul>
+                    <div className='flex justify-between'>
+                      <span className='text-gray-400'>Precio por ticket:</span>
+                      <CountryPrice amount={raffle.price} className="font-medium text-white" />
+                    </div>
+                    <div className='flex justify-between pt-2 border-t border-gray-800'>
+                      <span className='text-gray-400'>Total:</span>
+                      <CountryPrice 
+                        amount={purchaseData.selectedTickets.length * raffle.price} 
+                        className="font-medium text-amber-400" 
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Método de pago */}
+                <div className='bg-black/40 p-4 rounded-lg border border-amber-500/10'>
+                  <h3 className='font-medium text-amber-400 mb-2 flex items-center gap-2'>
+                    <CreditCard className='h-4 w-4' />
+                    Método de pago
+                  </h3>
+                  <div className='space-y-2 text-gray-300'>
+                    <div className='flex justify-between'>
+                      <span className='text-gray-400'>Método:</span>
+                      <span className='font-medium text-white'>{paymentMethod?.name}</span>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span className='text-gray-400'>Referencia:</span>
+                      <span className='font-medium text-white'>{purchaseData.paymentReference}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -116,22 +143,13 @@ const SuccessModal = ({ isOpen, onClose, purchaseData, raffle }) => {
                   href={whatsappUrl}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className={cn(
-                    'flex-1 px-6 py-3 bg-green-600 text-white rounded-lg',
-                    'hover:bg-green-700 transition-colors',
-                    'focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2',
-                    'font-medium text-sm text-center'
-                  )}>
+                  className='flex-1 px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-black rounded-lg hover:shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all duration-300 font-medium text-sm flex items-center justify-center gap-2'>
                   Contactar por WhatsApp
+                  <ArrowRight className="w-4 h-4" />
                 </a>
                 <button
-                  onClick={onClose}
-                  className={cn(
-                    'flex-1 px-6 py-3 bg-gray-700 text-white rounded-lg',
-                    'hover:bg-gray-600 transition-colors',
-                    'focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2',
-                    'font-medium text-sm'
-                  )}>
+                  onClick={() => onClose()}
+                  className='flex-1 px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium'>
                   Cerrar
                 </button>
               </div>

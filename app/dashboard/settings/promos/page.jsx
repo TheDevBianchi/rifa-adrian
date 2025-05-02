@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button'
-import { PlusCircle, Tag, Package, Percent, ArrowDownCircle, Trash2, Edit } from 'lucide-react'
+import { PlusCircle, Tag, Package, Percent, ArrowDownCircle, Trash2, Edit, Loader2, Settings } from 'lucide-react'
 import { PromoModal } from '@/components/promos/PromoModal'; 
 import { db } from '@/firebase'
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
+import Link from 'next/link';
 
 export default function PromosPage () {
   const [raffles, setRaffles] = useState([])
@@ -30,6 +31,7 @@ export default function PromosPage () {
   const [promotions, setPromotions] = useState([]) // State for all promotions
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false) // State for delete confirmation dialog
   const [promotionToDelete, setPromotionToDelete] = useState(null) // State for promotion to delete
+  const [isProcessing, setIsProcessing] = useState(false) // State for processing actions
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,21 +121,24 @@ export default function PromosPage () {
 
   const handleTogglePromoStatus = async (promotion) => {
     try {
+      setIsProcessing(true);
       const newStatus = !promotion.active;
       const result = await togglePromoStatus(promotion.id, newStatus);
       
       if (result.success) {
         // Update in state
         setPromotions(promotions.map(p => 
-          p.id === promotion.id ? {...p, active: newStatus} : p
+          p.id === promotion.id ? { ...p, active: newStatus } : p
         ));
-        toast.success(result.message);
+        toast.success(newStatus ? 'Promoción activada' : 'Promoción desactivada');
       } else {
         toast.error(result.message);
       }
     } catch (error) {
       console.error('Error toggling promotion status:', error);
       toast.error('Error al cambiar el estado de la promoción');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -172,61 +177,70 @@ export default function PromosPage () {
   };
 
   return (
-    <div className='container mx-auto py-8 px-4 md:px-6'>
-      <div className='flex justify-between items-center mb-8'>
-        <h1 className='text-3xl font-bold text-white'>
-          Gestión de Promociones
-        </h1>
-        <Button onClick={() => handleOpenCreateModal()} className='bg-primary hover:bg-primary/90'>
-          <PlusCircle className='mr-2 h-4 w-4' /> Crear Promoción
+    <div className='p-6 space-y-8'>
+      <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6'>
+        <div>
+          <div className='flex items-center gap-2'>
+            <Link 
+              href='/dashboard/settings' 
+              className='text-gray-400 hover:text-white transition-colors'
+            >
+              <Settings className='h-5 w-5' />
+            </Link>
+            <span className='text-gray-400'>/</span>
+            <h1 className='text-2xl font-bold bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent'>Promociones</h1>
+          </div>
+          <p className='text-gray-400 mt-1 text-sm'>Gestiona las promociones para tus rifas</p>
+        </div>
+        <Button 
+          onClick={() => handleOpenCreateModal()}
+          className='bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black transition-all duration-300'
+        >
+          <PlusCircle className='h-4 w-4 mr-2' />
+          Nueva Promoción
         </Button>
       </div>
 
       {loading ? (
-        <div className='text-center py-10'>
-          <p className='text-white'>Cargando datos...</p>
+        <div className='flex flex-col items-center justify-center py-12'>
+          <Loader2 className='w-10 h-10 animate-spin text-amber-500' />
+          <p className='text-gray-400 mt-4'>Cargando promociones...</p>
         </div>
       ) : (
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-          {raffles.map((raffle) => {
-            const rafflePromos = getPromotionsByRaffle(raffle.id);
+        <div className='space-y-8'>
+          {raffles.map(raffle => {
+            const rafflePromotions = getPromotionsByRaffle(raffle.id);
+            
             return (
-              <div
-                key={raffle.id}
-                className='bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-md'
-              >
-                <h2 className='text-xl font-semibold text-white mb-2 flex justify-between items-center'>
-                  <span>{raffle.title}</span>
-                  <Badge variant="outline" className="text-xs px-2 py-0.5">
-                    ${raffle.ticketPrice} / ticket
-                  </Badge>
-                </h2>
+              <div key={raffle.id} className='bg-black/60 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.05)] hover:shadow-[0_0_20px_rgba(245,158,11,0.1)] transition-all duration-300 rounded-xl overflow-hidden'>
+                <div className='bg-gradient-to-r from-amber-950/50 to-black p-4 flex justify-between items-center'>
+                  <h2 className='text-xl font-semibold text-amber-300'>{raffle.title}</h2>
+                  <Button 
+                    onClick={() => handleOpenCreateModal(raffle.id)} 
+                    size='sm'
+                    className='border-amber-500/30 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all duration-300'
+                    variant='outline'
+                    disabled={isProcessing}
+                  >
+                    <PlusCircle className='h-4 w-4 mr-2' />
+                    Agregar Promoción
+                  </Button>
+                </div>
                 
-                <div className='space-y-4 mt-4'>
-                  <div className='flex justify-between items-center'>
-                    <h3 className='text-sm font-medium text-gray-300'>Promociones</h3>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-xs hover:bg-gray-700" 
-                      onClick={() => handleOpenCreateModal(raffle.id)}
-                    >
-                      <PlusCircle className='mr-1 h-3 w-3' /> Agregar
-                    </Button>
-                  </div>
-                  
-                  {rafflePromos.length > 0 ? (
+                <div className='p-4'>
+                  {rafflePromotions.length > 0 ? (
                     <div className='space-y-3'>
-                      {rafflePromos.map((promo) => (
-                        <div 
-                          key={promo.id} 
-                          className={`flex justify-between items-center p-3 rounded-md ${promo.active ? 'bg-gray-700/50' : 'bg-gray-700/20 opacity-60'}`}
-                        >
-                          <div className='space-y-1'>
-                            <div className='flex items-center'>
-                              <span className='font-medium text-white mr-2'>{promo.name}</span>
-                              {!promo.active && (
-                                <Badge variant="outline" className="text-xs bg-gray-700 text-gray-400">
+                      {rafflePromotions.map(promo => (
+                        <div key={promo.id} className='flex justify-between items-center p-4 bg-gray-900/60 rounded-lg border border-gray-800 hover:border-amber-500/20 transition-all duration-300'>
+                          <div>
+                            <div className='flex items-center space-x-2 mb-1'>
+                              <h3 className='font-medium text-white'>{promo.name}</h3>
+                              {promo.active ? (
+                                <Badge variant="outline" className="text-xs bg-green-900/20 text-green-400 border-green-500/30">
+                                  Activa
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline" className="text-xs bg-gray-800 text-gray-400 border-gray-700">
                                   Inactiva
                                 </Badge>
                               )}
@@ -236,43 +250,61 @@ export default function PromosPage () {
                             </div>
                           </div>
                           
-                          <div className='flex space-x-1'>
+                          <div className='flex space-x-2'>
                             <Button 
                               variant="ghost" 
                               size="sm" 
-                              className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-gray-700"
+                              className={`h-8 w-8 p-0 rounded-full ${promo.active ? 'text-green-500 hover:text-red-400 hover:bg-red-500/10' : 'text-gray-500 hover:text-green-400 hover:bg-green-500/10'}`}
                               onClick={() => handleTogglePromoStatus(promo)}
                               title={promo.active ? "Desactivar" : "Activar"}
+                              disabled={isProcessing}
                             >
                               <span className="sr-only">{promo.active ? "Desactivar" : "Activar"}</span>
-                              {promo.active ? "🔴" : "🟢"}
+                              {promo.active ? "🟢" : "⚪"}
                             </Button>
                             <Button 
-                              variant="ghost" 
+                              variant="outline" 
                               size="sm" 
-                              className="h-8 w-8 p-0 text-blue-400 hover:text-blue-300 hover:bg-gray-700"
+                              className="border-blue-500/30 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-all duration-300"
                               onClick={() => handleOpenEditModal(promo)}
+                              disabled={isProcessing}
                             >
-                              <span className="sr-only">Editar</span>
-                              <Edit className="h-4 w-4" />
+                              <Edit className="h-4 w-4 mr-1" />
+                              Editar
                             </Button>
                             <Button 
-                              variant="ghost" 
+                              variant="outline" 
                               size="sm" 
-                              className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-gray-700"
+                              className="border-red-500/30 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-300"
                               onClick={() => handleDeletePromotion(promo)}
+                              disabled={isProcessing}
                             >
-                              <span className="sr-only">Eliminar</span>
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-4 w-4 mr-1" />
+                              Eliminar
                             </Button>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className='text-gray-400 text-sm py-3 text-center border border-dashed border-gray-700 rounded-md'>
-                      No hay promociones configuradas para esta rifa.
-                    </p>
+                    <div className='text-center py-8 bg-black/50 rounded-lg border border-dashed border-amber-500/20 px-4'>
+                      <Tag className='w-10 h-10 text-amber-500/70 mx-auto mb-3' />
+                      <h3 className='text-lg font-semibold text-amber-300 mb-2'>
+                        Sin promociones
+                      </h3>
+                      <p className='text-gray-400 mb-4 text-sm'>
+                        No hay promociones configuradas para esta rifa.
+                      </p>
+                      <Button 
+                        onClick={() => handleOpenCreateModal(raffle.id)}
+                        className='bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black transition-all duration-300'
+                        size='sm'
+                        disabled={isProcessing}
+                      >
+                        <PlusCircle className='h-4 w-4 mr-2' />
+                        Crear Promoción
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -292,11 +324,11 @@ export default function PromosPage () {
       
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-gray-900 border-gray-700 text-white">
+        <AlertDialogContent className="bg-gray-900 border-gray-800 border-amber-500/10 text-white">
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-400">
-              Esta acción eliminará permanentemente la promoción &quot;{promotionToDelete?.name}&quot; y no se puede deshacer.
+            <AlertDialogTitle className="text-amber-400">¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-300">
+              Esta acción eliminará permanentemente la promoción <span className="font-medium text-white">&quot;{promotionToDelete?.name}&quot;</span> y no se puede deshacer.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -306,8 +338,16 @@ export default function PromosPage () {
             <AlertDialogAction
               className="bg-red-600 text-white hover:bg-red-700"
               onClick={confirmDeletePromotion}
+              disabled={isProcessing}
             >
-              Eliminar
+              {isProcessing ? (
+                <span className="flex items-center">
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Eliminando...
+                </span>
+              ) : (
+                'Eliminar'
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

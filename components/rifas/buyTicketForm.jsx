@@ -11,16 +11,22 @@ import PaymentInfoSection from './PaymentInfoSection'
 import TicketSelectionSection from './TicketSelectionSection'
 import FloatingTotal from './FloatingTotal'
 import SuccessModal from './success-modal'
+import ConfirmationModal from './confirmation-modal'
 import { AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
+import { useCountryStore } from '@/store/use-country-store'
 
 const BuyTicketForm = ({ raffle, onSubmit }) => {
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const [submittedData, setSubmittedData] = useState(null)
+  const [formData, setFormData] = useState(null)
   const [randomTicketCount, setRandomTicketCount] = useState(0)
   const [showAllTickets, setShowAllTickets] = useState(false)
   const [error, setError] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const { dollarPrice, getDollarPrice } = useDollarPrice()
+  const { selectedCountry } = useCountryStore()
   
   // Estado para las promociones
   const [promotionData, setPromotionData] = useState({
@@ -46,7 +52,7 @@ const BuyTicketForm = ({ raffle, onSubmit }) => {
 
   const {
     control,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     watch,
     setValue,
   } = form
@@ -58,7 +64,7 @@ const BuyTicketForm = ({ raffle, onSubmit }) => {
     getDollarPrice()
   }, [getPaymentMethods, getDollarPrice])
 
-  const handleSubmit = async (data) => {
+  const validateForm = (data) => {
     setError(null)
     
     try {
@@ -83,22 +89,51 @@ const BuyTicketForm = ({ raffle, onSubmit }) => {
           savings: promotionData.savings
         } : null
       }
+      
+      return dataWithPromotion
+    } catch (error) {
+      console.error('Error de validación:', error)
+      setError(error.message || 'Ha ocurrido un error al validar tu compra')
+      toast.error('Error de validación', {
+        description: error.message || 'Ha ocurrido un error al validar tu compra',
+      })
+      return null
+    }
+  }
 
-      const result = await onSubmit(dataWithPromotion)
+  const handleSubmit = async (data) => {
+    const validatedData = validateForm(data)
+    if (!validatedData) return
+    
+    setFormData(validatedData)
+    setShowConfirmationModal(true)
+  }
+  
+  const handleConfirmPurchase = async () => {
+    if (!formData) return
+    
+    setIsSubmitting(true)
+    setError(null)
+    
+    try {
+      const result = await onSubmit(formData)
       
       if (result) {
+        setShowConfirmationModal(false)
         form.reset()
         setRandomTicketCount(0)
         setShowSuccessModal(true)
-        setSubmittedData(dataWithPromotion)
+        setSubmittedData(formData)
       }
     } catch (error) {
       console.error('Error al procesar la compra:', error)
       setError(error.message || 'Ha ocurrido un error al procesar tu compra')
-      setShowSuccessModal(false)
+      setShowConfirmationModal(false)
       toast.error('Error al procesar la compra', {
         description: error.message || 'Ha ocurrido un error al procesar tu compra',
       })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -153,17 +188,28 @@ const BuyTicketForm = ({ raffle, onSubmit }) => {
         paymentMethods={paymentMethods}
         loading={loading}
         selectedMethod={selectedMethod}
+        raffle={raffle}
       />
       <FloatingTotal
         ticketCount={ticketCount}
         raffle={raffle}
-        isSubmitting={form.formState.isSubmitting}
+        isSubmitting={form.formState.isSubmitting || isSubmitting}
         minTickets={raffle.minTickets}
         selectedPromotion={promotionData.selectedPromotion}
         regularTotal={promotionData.regularTotal}
         discountedTotal={promotionData.discountedTotal}
         savings={promotionData.savings}
       />
+      <ConfirmationModal
+        isOpen={showConfirmationModal}
+        onClose={() => setShowConfirmationModal(false)}
+        onConfirm={handleConfirmPurchase}
+        purchaseData={formData}
+        raffle={raffle}
+        paymentMethod={paymentMethods.find(method => method.id === selectedMethod)}
+        isSubmitting={isSubmitting}
+      />
+      
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={() => {

@@ -101,11 +101,53 @@ module.exports = {
   				to: {
   					height: '0'
   				}
-  			}
+  			},
+            'float-1': {
+              '0%, 100%': {
+                transform: 'translateY(0)',
+                opacity: '0.7'
+              },
+              '50%': {
+                transform: 'translateY(-20px)',
+                opacity: '0.9'
+              }
+            },
+            'float-2': {
+              '0%, 100%': {
+                transform: 'translateY(0) translateX(0)',
+                opacity: '0.6'
+              },
+              '50%': {
+                transform: 'translateY(-15px) translateX(10px)',
+                opacity: '0.8'
+              }
+            },
+            'float-3': {
+              '0%, 100%': {
+                transform: 'translateY(0) translateX(0)',
+                opacity: '0.7'
+              },
+              '50%': {
+                transform: 'translateY(-10px) translateX(-10px)',
+                opacity: '0.9'
+              }
+            },
+            'pulse-slow': {
+              '0%, 100%': {
+                opacity: '0.3'
+              },
+              '50%': {
+                opacity: '0.5'
+              }
+            }
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+            'float-1': 'float-1 5s ease-in-out infinite',
+            'float-2': 'float-2 7s ease-in-out infinite',
+            'float-3': 'float-3 6s ease-in-out infinite',
+            'pulse-slow': 'pulse-slow 4s ease-in-out infinite'
   		},
   		backgroundImage: {
   			'footer-gradient': 'linear-gradient(135deg, #000000 2%, #490505 63%, #06145D 100%)'

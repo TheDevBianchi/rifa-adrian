@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
+import CountrySelector from "@/components/ui/country-selector"
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -28,7 +29,7 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Inicio', href: '/' },
     { name: 'Rifas', href: '/rifas' },
-    { name: 'Cómo Jugar', href: '/como-jugar' },
+    { name: 'Cómo Participar', href: '/como-participar' },
     { name: 'Contacto', href: '/contacto' }
   ]
 
@@ -63,6 +64,9 @@ const Navbar = () => {
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center space-x-4">
+            {/* Selector de países */}
+            <CountrySelector />
+            
             <Link href="/dashboard" className="flex items-center text-white hover:text-amber-300 transition-colors">
               <User className="h-5 w-5 mr-1" />
               <span className="text-sm">Mi Cuenta</span>
@@ -107,6 +111,11 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="pt-4 border-t border-gray-800 flex flex-col space-y-3">
+              {/* Selector de países en móvil */}
+              <div className="flex items-center justify-center py-2">
+                <CountrySelector />
+              </div>
+              
               <Link 
                 href="/dashboard" 
                 className="flex items-center text-white hover:text-amber-300 transition-colors py-2"

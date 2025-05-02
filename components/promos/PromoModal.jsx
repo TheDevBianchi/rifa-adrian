@@ -84,6 +84,7 @@ export function PromoModal({ isOpen, onClose, raffleId, promotion, onPromotionSa
                 name: data.name,
                 raffleId: data.raffleId,
                 discountType: data.discountType,
+                active: true // Por defecto, las promociones se crean activas
             };
             
             // Agregar campos específicos según el tipo de descuento
@@ -94,6 +95,9 @@ export function PromoModal({ isOpen, onClose, raffleId, promotion, onPromotionSa
             } else if (data.discountType === 'package') {
                 promoData.minTickets = data.minTickets;
                 promoData.packagePrice = data.packagePrice;
+            } else if (data.discountType === 'creator_code') {
+                promoData.creatorCode = data.creatorCode;
+                promoData.discountValue = data.discountValue;
             }
             
             let result;
@@ -187,23 +191,26 @@ export function PromoModal({ isOpen, onClose, raffleId, promotion, onPromotionSa
 
                 {/* Discount Type and Conditional Fields */}
                 <div className="space-y-4 p-4 border border-gray-700 rounded-lg bg-gray-800/50"> {/* Grouping wrapper */}
-                    <div className="grid grid-cols-4 items-center gap-x-4 gap-y-2">
-                        <Label htmlFor="discountType" className="text-right col-span-1 text-sm text-gray-300">
-                            Tipo Descuento
+                    <div className="space-y-2">
+                        <Label htmlFor="discountType" className="text-sm text-gray-300">
+                            Tipo de Descuento
                         </Label>
-                         <Controller
+                        <Controller
                             name="discountType"
                             control={control}
-                            defaultValue={isEditing ? promotion?.discountType : ""}
                             rules={{ required: "El tipo de descuento es requerido" }}
                             render={({ field }) => (
                                 <Select
-                                    onValueChange={(value) => { /* Keep reset logic */
+                                    onValueChange={(value) => {
                                         field.onChange(value);
                                         reset({
                                             ...getValues(),
                                             discountType: value,
-                                            discountValue: '', minTickets: '', packagePrice: '', newTicketPrice: ''
+                                            discountValue: '', 
+                                            minTickets: '', 
+                                            packagePrice: '', 
+                                            newTicketPrice: '',
+                                            creatorCode: ''
                                         });
                                     }}
                                     value={field.value || ''}
@@ -215,6 +222,7 @@ export function PromoModal({ isOpen, onClose, raffleId, promotion, onPromotionSa
                                     <SelectItem value="percentage" className="hover:bg-gray-700 focus:bg-gray-700"><Percent className="inline h-4 w-4 mr-2 text-yellow-400"/>Porcentaje (%)</SelectItem>
                                     <SelectItem value="lower_cost" className="hover:bg-gray-700 focus:bg-gray-700"><ArrowDownCircle className="inline h-4 w-4 mr-2 text-red-400"/>Bajar Coste Tickets</SelectItem>
                                     <SelectItem value="package" className="hover:bg-gray-700 focus:bg-gray-700"><Package className="inline h-4 w-4 mr-2 text-green-400"/>Paquete Boletos</SelectItem>
+                                    <SelectItem value="creator_code" className="hover:bg-gray-700 focus:bg-gray-700"><Tag className="inline h-4 w-4 mr-2 text-purple-400"/>Código de Creador</SelectItem>
                                 </SelectContent>
                                 </Select>
                             )}
@@ -240,6 +248,47 @@ export function PromoModal({ isOpen, onClose, raffleId, promotion, onPromotionSa
                                 />
                                 {errors.discountValue && <p className="col-span-full text-red-400 text-xs mt-1 text-right">{errors.discountValue.message}</p>}
                             </div>
+                        )}
+                        
+                        {discountType === 'creator_code' && (
+                            <>
+                                <div className="grid grid-cols-4 items-center gap-x-4 gap-y-2">
+                                    <Label htmlFor="creatorCode" className="text-right col-span-1 text-sm text-gray-300">
+                                        Código
+                                    </Label>
+                                    <Input
+                                        id="creatorCode" type="text" placeholder="Ej: CREADOR10"
+                                        {...register('creatorCode', {
+                                            required: 'El código de creador es requerido',
+                                            minLength: { value: 3, message: 'Mínimo 3 caracteres' },
+                                            maxLength: { value: 20, message: 'Máximo 20 caracteres' },
+                                            pattern: {
+                                                value: /^[A-Za-z0-9_-]+$/,
+                                                message: 'Solo letras, números, guiones y guiones bajos'
+                                            }
+                                        })}
+                                        className="col-span-3 bg-gray-700 border-gray-600 text-white placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                    {errors.creatorCode && <p className="col-span-full text-red-400 text-xs mt-1 text-right">{errors.creatorCode.message}</p>}
+                                </div>
+                                
+                                <div className="grid grid-cols-4 items-center gap-x-4 gap-y-2">
+                                    <Label htmlFor="discountValue" className="text-right col-span-1 text-sm text-gray-300">
+                                        Descuento (%)
+                                    </Label>
+                                    <Input
+                                        id="discountValue" type="number" placeholder="Ej: 10"
+                                        {...register('discountValue', {
+                                            required: 'El porcentaje de descuento es requerido', 
+                                            valueAsNumber: true,
+                                            min: { value: 1, message: 'El porcentaje debe ser positivo' },
+                                            max: { value: 99, message: 'El porcentaje debe ser menor a 100' }
+                                        })}
+                                        className="col-span-3 bg-gray-700 border-gray-600 text-white placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500"
+                                    />
+                                    {errors.discountValue && <p className="col-span-full text-red-400 text-xs mt-1 text-right">{errors.discountValue.message}</p>}
+                                </div>
+                            </>
                         )}
 
                         {discountType === 'lower_cost' && (

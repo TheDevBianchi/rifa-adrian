@@ -1,5 +1,8 @@
 import { motion } from 'framer-motion'
-import { Tag, Percent, ArrowDownCircle, Package } from 'lucide-react'
+import { Tag, Percent, ArrowDownCircle, Package, DollarSign } from 'lucide-react'
+import { useCountryStore } from '@/store/use-country-store'
+import { useDollarPrice } from '@/hooks/useDollarPrice'
+import CountryPrice from '@/components/ui/country-price'
 
 const FloatingTotal = ({ 
   ticketCount,  
@@ -8,7 +11,8 @@ const FloatingTotal = ({
   selectedPromotion,
   regularTotal,
   discountedTotal,
-  savings
+  savings,
+  raffle
 }) => {
 
   return (
@@ -46,17 +50,25 @@ const FloatingTotal = ({
           <div className='space-y-1'>
             {selectedPromotion && (
               <div className='flex items-center'>
-                <span className='text-sm text-gray-400 line-through mr-2'>${regularTotal.toFixed(2)}</span>
+                <span className='text-sm text-gray-400 line-through mr-2'>
+                  <CountryPrice amount={regularTotal} className="inline" />
+                </span>
                 <span className='text-xs bg-amber-900/30 text-amber-300 px-2 py-0.5 rounded-full'>
-                  Ahorras ${savings.toFixed(2)}
+                  Ahorras <CountryPrice amount={savings} className="inline" />
                 </span>
               </div>
             )}
-            <div className='flex items-center'>
-              <span className='text-sm font-medium text-gray-300 mr-2'>Total:</span>
-              <span className='text-lg font-bold bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent'>
-                ${discountedTotal.toFixed(2)}
-              </span>
+            <div className='flex flex-col'>
+              <div className='flex items-center'>
+                <span className='text-sm font-medium text-gray-300 mr-2'>Total:</span>
+                <span className='text-lg font-bold bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent'>
+                  <CountryPrice amount={discountedTotal} className="inline" />
+                </span>
+              </div>
+              <div className='flex items-center text-xs text-gray-400 mt-1'>
+                <DollarSign className='w-3 h-3 mr-1' />
+                <span>Precio base: ${discountedTotal.toFixed(2)} USD</span>
+              </div>
             </div>
           </div>
           

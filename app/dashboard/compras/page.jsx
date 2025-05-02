@@ -83,10 +83,10 @@ const PurchasesPage = () => {
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Gestión de Compras</h1>
-        <Button onClick={() => setPurchaseModalOpen(true)}>
+        {/* <Button onClick={() => setPurchaseModalOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Nueva Compra
-        </Button>
+        </Button> */}
       </div>
 
       <div className="mb-6">

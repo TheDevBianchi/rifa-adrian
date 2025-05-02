@@ -41,8 +41,8 @@ export const verifyTickets = async (raffleId, userData) => {
             // Buscar todas las coincidencias en el array de users
             const matchingUsers = raffle.users.filter(user => 
                 user.email?.toLowerCase() === email.toLowerCase() &&
-                user.phone === phone &&
-                user.name === name
+                user.phone == phone &&
+                user.name == name
             );
 
             // Agregar cada coincidencia encontrada

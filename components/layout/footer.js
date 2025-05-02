@@ -35,7 +35,7 @@ function Footer() {
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                <Image src='/facebook.svg' alt='Facebook' width={24} height={24} className='filter invert sepia-0 saturate-0 brightness-100 contrast-100' />
+                <Image src='/facebook.svg' alt='Facebook' width={24} height={24} className='' />
               </Link>
               <Link
                 href='https://www.instagram.com/jirvin.flores'
@@ -75,7 +75,7 @@ function Footer() {
                 <Link href='/rifas' className='text-gray-300 hover:text-amber-300 transition-colors'>Rifas Disponibles</Link>
               </li>
               <li>
-                <Link href='/como-jugar' className='text-gray-300 hover:text-amber-300 transition-colors'>Cómo Participar</Link>
+                <Link href='/como-participar' className='text-gray-300 hover:text-amber-300 transition-colors'>Cómo Participar</Link>
               </li>
               <li>
                 <Link href='/contacto' className='text-gray-300 hover:text-amber-300 transition-colors'>Contacto</Link>

@@ -22,9 +22,9 @@ export function UserInfoField({ label, value, isSensitive = false }) {
 
   return (
     <div className='relative'>
-      <label className='text-sm text-gray-400'>{label}:</label>
+      <label className='text-sm text-amber-500/80'>{label}:</label>
       <div className='flex items-center gap-2'>
-        <p className='font-medium'>
+        <p className='font-medium text-gray-200'>
           {isSensitive ? (isVisible ? value : maskValue(value)) : value}
         </p>
         {isSensitive && (
@@ -32,11 +32,11 @@ export function UserInfoField({ label, value, isSensitive = false }) {
             variant='ghost'
             size='sm'
             onClick={toggleVisibility}
-            className='p-1 h-auto'>
+            className='p-1 h-auto hover:bg-amber-900/20 hover:text-amber-500'>
             {isVisible ? (
-              <EyeOff className='h-4 w-4 text-gray-400' />
+              <EyeOff className='h-4 w-4 text-amber-500/70' />
             ) : (
-              <Eye className='h-4 w-4 text-gray-400' />
+              <Eye className='h-4 w-4 text-amber-500/70' />
             )}
           </Button>
         )}

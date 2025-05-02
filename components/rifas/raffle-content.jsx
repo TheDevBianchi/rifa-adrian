@@ -14,11 +14,11 @@ export function RaffleContent ({ raffle, onSubmit }) {
         </div>
         
         {/* Contenido principal */}
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+        <div className='grid grid-cols-1 gap-8'>
           <div className='lg:col-span-2'>
             <RaffleDetails raffle={raffle} />
           </div>
-          <div className='lg:col-span-1'>
+          <div className='lg:col-span-1 w-full'>
             <div className='bg-[#111111] rounded-xl border border-amber-500/10 hover:border-amber-500/30 transition-all duration-300 hover:shadow-[0_0_15px_rgba(245,158,11,0.1)] overflow-hidden sticky top-24'>
               <div className='bg-gradient-to-r from-amber-500 to-amber-600 py-3 px-4'>
                 <h2 className='text-black font-bold text-lg text-center'>Comprar Tickets</h2>

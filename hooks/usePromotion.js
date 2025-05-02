@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { getPromotionsByRaffleId } from '@/utils/firebase/promoService';
+import { getPromotionsByRaffleId, validateCreatorCodeByRaffleId } from '@/utils/firebase/promoService';
 
 /**
  * Hook para gestionar las promociones de una rifa
@@ -167,6 +167,29 @@ export function usePromotion(raffleId, ticketPrice) {
     return regularPrice - discountedPrice;
   }, [calculateTotal, ticketPrice]);
 
+  /**
+   * Valida un código de creador para la rifa actual
+   * @param {string} code - Código de creador a validar
+   * @returns {Promise<Object>} - Resultado de la validación
+   */
+  const validateCreatorCode = useCallback(async (code) => {
+    if (!code || !raffleId) {
+      return { success: false, message: 'Código o rifa inválidos' };
+    }
+    
+    try {
+      // Llamar al servicio para validar el código
+      const result = await validateCreatorCodeByRaffleId(raffleId, code);
+      return result;
+    } catch (error) {
+      console.error('Error al validar código de creador:', error);
+      return { 
+        success: false, 
+        message: error.message || 'Error al validar el código'
+      };
+    }
+  }, [raffleId]);
+
   return {
     promotions,
     loading,
@@ -177,6 +200,7 @@ export function usePromotion(raffleId, ticketPrice) {
     isPromotionApplicable,
     getApplicablePromotions,
     getBestPromotion,
-    calculateSavings
+    calculateSavings,
+    validateCreatorCode
   };
 }

@@ -15,8 +15,8 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { Button } from '@/components/ui/button'
 import { UndoAction } from './UndoAction'
+import { ConfirmAction } from './ConfirmAction'
 import { TableSkeleton } from './TableSkeleton'
 import {
   Tooltip,
@@ -24,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { CheckCircle, AlertCircle } from 'lucide-react'
 
 export const PurchaseTable = memo(({ purchases, isLoading, selectedRaffle, onPurchaseUpdate }) => {
   const [currentPage, setCurrentPage] = useState(1)
@@ -128,11 +129,13 @@ export const PurchaseTable = memo(({ purchases, isLoading, selectedRaffle, onPur
                   </TooltipProvider>
                 </TableCell>
                 <TableCell>
-                  <UndoAction 
-                    purchase={purchase} 
-                    selectedRaffle={selectedRaffle}
-                    onPurchaseUpdate={onPurchaseUpdate} 
-                  />
+                  <div className="flex items-center space-x-2">
+                    <UndoAction 
+                      purchase={purchase} 
+                      selectedRaffle={selectedRaffle}
+                      onPurchaseUpdate={onPurchaseUpdate} 
+                    />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

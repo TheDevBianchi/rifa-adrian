@@ -1,6 +1,8 @@
 import { useState, useMemo, useCallback, memo } from 'react'
 import { UserInfoDialog } from '@/components/dashboard/UserInfoDialog'
 import { UnreservTicketDialog } from '@/components/dashboard/UnreservTicketDialog'
+import { Ticket, AlertCircle, User } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const TicketGrid = memo(({
   totalTickets,
@@ -127,47 +129,83 @@ const TicketGrid = memo(({
 
   return (
     <>
-      <div className='grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2'>
+      <div className='grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 max-h-[600px] overflow-y-auto p-2'>
         {tickets.map(ticket => (
-          <button
+          <div
             key={ticket.number}
-            id={`ticket-${ticket.number}`}
-            type='button'
-            onClick={() => {
-              if (isDashboard && ticket.buyer) {
-                setSelectedUser({
-                  ...ticket.buyer,
-                  ticketNumber: ticket.formattedNumber
-                })
-                setDialogOpen(true)
-                setSelectedIndex(ticket.number)
-              } else {
-                handleTicketClick(ticket.number, ticket.isReserved)
-              }
-            }}
-            disabled={ticket.isDisabled}
-            aria-label={`Número ${ticket.formattedNumber}${
-              ticket.isReserved ? ', reservado' : ticket.isSold ? ', vendido' : ''
-            }`}
-            aria-pressed={ticket.isSelected}
-            className={`
-              p-2 text-center border rounded
-              transition-colors duration-200
-              focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-              ${ticket.cursorStyle}
-              ${ticket.isHighlighted ? 'ring-4 ring-primary ring-opacity-75' : ''}
-              ${ticket.isSelected ? 'bg-primary text-white' : ''}
-              ${
-                ticket.isReserved
-                  ? 'bg-amber-500 text-white hover:bg-amber-600'
-                  : ticket.isSold
-                  ? 'bg-red-500 text-white hover:bg-red-600'
-                  : 'bg-emerald-500 text-white hover:bg-emerald-600'
-              }
-            `}
+            className={cn(
+              'relative group',
+              ticket.isHighlighted && 'z-10'
+            )}
           >
-            {ticket.formattedNumber}
-          </button>
+            <button
+              id={`ticket-${ticket.number}`}
+              type='button'
+              onClick={() => {
+                if (isDashboard && ticket.buyer) {
+                  setSelectedUser({
+                    ...ticket.buyer,
+                    ticketNumber: ticket.formattedNumber
+                  })
+                  setDialogOpen(true)
+                  setSelectedIndex(ticket.number)
+                } else {
+                  handleTicketClick(ticket.number, ticket.isReserved)
+                }
+              }}
+              disabled={ticket.isDisabled}
+              aria-label={`Número ${ticket.formattedNumber}${
+                ticket.isReserved ? ', reservado' : ticket.isSold ? ', vendido' : ''
+              }`}
+              aria-pressed={ticket.isSelected}
+              className={cn(
+                'w-full p-2 text-sm rounded-md transition-all duration-300 flex items-center justify-center',
+                'focus:outline-none focus:ring-2',
+                ticket.cursorStyle,
+                ticket.isHighlighted && 'ring-4 ring-amber-500 ring-opacity-75',
+                ticket.isSelected && 'bg-amber-500 text-gray-900 shadow-[0_0_10px_rgba(245,158,11,0.3)]',
+                ticket.isSold && 'bg-black text-amber-500 border border-amber-500/30 cursor-not-allowed',
+                ticket.isReserved && 'bg-amber-900/20 text-amber-300 border border-amber-500/30',
+                !ticket.isSold && !ticket.isReserved && !ticket.isSelected && 'bg-black/50 text-gray-200 border border-gray-700/50 hover:bg-gray-800/50 hover:border-amber-600/50'
+              )}
+            >
+              {ticket.isSold ? (
+                <Ticket className="w-3 h-3 mr-1" />
+              ) : ticket.isReserved ? (
+                <AlertCircle className="w-3 h-3 mr-1" />
+              ) : null}
+              {ticket.formattedNumber}
+            </button>
+            
+            {/* Mostrar información del comprador en tickets vendidos */}
+            {isDashboard && ticket.buyer && (
+              <div className="absolute -top-1 -right-1 bg-amber-500 text-black rounded-full p-0.5 cursor-pointer"
+                onClick={() => {
+                  setSelectedUser({
+                    ...ticket.buyer,
+                    ticketNumber: ticket.formattedNumber
+                  })
+                  setDialogOpen(true)
+                  setSelectedIndex(ticket.number)
+                }}
+              >
+                <User className="w-3 h-3" />
+              </div>
+            )}
+            
+            {/* Botón para liberar tickets reservados */}
+            {isDashboard && ticket.isReserved && (
+              <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button 
+                  type="button" 
+                  className="h-5 w-5 rounded-full bg-amber-500 text-black flex items-center justify-center"
+                  onClick={() => setTicketToUnreserve(ticket.number)}
+                >
+                  <span className="text-xs font-bold">×</span>
+                </button>
+              </div>
+            )}
+          </div>
         ))}
       </div>
 

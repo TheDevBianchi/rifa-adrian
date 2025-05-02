@@ -76,7 +76,7 @@ const Sidebar = () => {
       <Button
         variant='ghost'
         size='icon'
-        className='md:hidden p-2 text-primary hover:bg-primary/20 hover:text-primary-400 transition-colors'
+        className='md:hidden p-2 text-amber-500 hover:bg-amber-500/10 hover:text-amber-300 transition-colors'
         onClick={() => setIsMobileOpen(!isMobileOpen)}
       >
         {isMobileOpen ? (
@@ -97,16 +97,16 @@ const Sidebar = () => {
       {/* Sidebar */}
       <div
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-72 bg-black/60 backdrop-blur-xl border-r border-primary/20 shadow-[0_0_30px_rgba(0,255,140,0.1)] transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0',
+          'fixed inset-y-0 left-0 z-50 w-72 bg-black/90 backdrop-blur-xl border-r border-amber-500/20 shadow-[0_0_30px_rgba(245,158,11,0.1)] transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
         <div className='flex h-screen flex-col justify-between space-y-4'>
           <div className='flex flex-col space-y-2 p-4'>
             {/* Logo y título */}
-            <div className='flex h-16 items-center border-b border-primary/20 px-6'>
-              <h1 className='text-2xl font-bold bg-gradient-to-r from-primary-400 via-secondary-400 to-accent-400 bg-clip-text text-transparent'>
-                rifa con jirvin
+            <div className='flex h-16 items-center border-b border-amber-500/20 px-6'>
+              <h1 className='text-2xl font-bold bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent'>
+                Rifas Adrian
               </h1>
             </div>
 
@@ -118,9 +118,9 @@ const Sidebar = () => {
                   href={route.href}
                   className={cn(
                     'flex items-center gap-x-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300',
-                    'hover:bg-primary/20 hover:text-primary-400',
+                    'hover:bg-amber-500/10 hover:text-amber-300',
                     pathname === route.href
-                      ? 'bg-primary text-[#222225] shadow-[0_0_15px_rgba(0,255,140,0.2)]'
+                      ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-[0_0_15px_rgba(245,158,11,0.2)]'
                       : 'text-gray-200'
                   )}
                 >
@@ -128,8 +128,8 @@ const Sidebar = () => {
                     className={cn(
                       'h-5 w-5',
                       pathname === route.href
-                        ? 'text-[#222225]'
-                        : 'text-gray-400 group-hover:text-primary-400'
+                        ? 'text-black'
+                        : 'text-gray-400 group-hover:text-amber-300'
                     )}
                   />
                   {route.label}
@@ -139,10 +139,10 @@ const Sidebar = () => {
           </div>
 
           {/* Botón de cerrar sesión */}
-          <div className='mt-auto p-4 border-t border-primary/20'>
+          <div className='mt-auto p-4 border-t border-amber-500/20'>
             <Button
               variant='ghost'
-              className='w-full justify-start text-gray-400 hover:text-red-400 hover:bg-red-500/10'
+              className='w-full justify-start text-gray-400 hover:text-amber-300 hover:bg-amber-500/10 transition-all duration-300'
               onClick={handleSignOut}
             >
               <LogOut className='h-5 w-5 mr-2' />

@@ -17,9 +17,9 @@ export default function Layout ({ children }) {
       disableTransitionOnChange
     >
       <AuthGuard>
-        <div className='min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-900/20 via-background to-secondary-900/20'>
+        <div className='min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-900/10 via-black to-amber-900/5'>
           <div className='relative'>
-            <div className='absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f12_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f12_1px,transparent_1px)] bg-[size:14px_24px]'></div>
+            <div className='absolute inset-0 bg-[linear-gradient(to_right,#f59e0b10_1px,transparent_1px),linear-gradient(to_bottom,#f59e0b10_1px,transparent_1px)] bg-[size:14px_24px]'></div>
             <div className='flex min-h-screen relative'>
               <div className='hidden md:block'>
                 <Sidebar />

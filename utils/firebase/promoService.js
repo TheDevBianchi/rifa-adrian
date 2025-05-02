@@ -8,7 +8,8 @@ import {
   query, 
   where, 
   deleteDoc,
-  serverTimestamp
+  serverTimestamp,
+  getDoc
 } from 'firebase/firestore';
 
 const PROMOS_COLLECTION = 'promotions';
@@ -221,6 +222,59 @@ export const getPromotionById = async (promoId) => {
     return {
       success: false,
       message: 'Error al obtener la promoción: ' + error.message
+    };
+  }
+};
+
+/**
+ * Valida un código de creador para una rifa específica
+ * @param {string} raffleId - ID de la rifa
+ * @param {string} code - Código de creador a validar
+ * @returns {Promise<Object>} - Resultado de la validación y promoción si es válida
+ */
+export const validateCreatorCodeByRaffleId = async (raffleId, code) => {
+  try {
+    if (!raffleId || !code) {
+      return {
+        success: false,
+        message: 'Rifa o código inválidos'
+      };
+    }
+    
+    // Buscar promociones de tipo creator_code para esta rifa
+    const q = query(
+      collection(db, PROMOS_COLLECTION),
+      where('raffleId', '==', raffleId),
+      where('discountType', '==', 'creator_code'),
+      where('creatorCode', '==', code.trim().toUpperCase()),
+      where('active', '==', true)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    
+    if (querySnapshot.empty) {
+      return {
+        success: false,
+        message: 'Código de creador inválido o expirado'
+      };
+    }
+    
+    // Devolver la primera promoción que coincida
+    const promo = {
+      id: querySnapshot.docs[0].id,
+      ...querySnapshot.docs[0].data()
+    };
+    
+    return {
+      success: true,
+      promotion: promo,
+      message: 'Código de creador válido'
+    };
+  } catch (error) {
+    console.error('Error al validar código de creador:', error);
+    return {
+      success: false,
+      message: 'Error al validar el código: ' + error.message
     };
   }
 };
