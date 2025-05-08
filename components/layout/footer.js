@@ -35,7 +35,7 @@ function Footer() {
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                <Image src='/facebook.svg' alt='Facebook' width={24} height={24} className='' />
+                <Image src='/facebook.svg' alt='Facebook' width={24} height={24} />
               </Link>
               <Link
                 href='https://www.instagram.com/jirvin.flores'
@@ -43,7 +43,7 @@ function Footer() {
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                <Image src='/instagram.svg' alt='Instagram' width={24} height={24} className='filter invert sepia-0 saturate-0 brightness-100 contrast-100' />
+                <Image src='/instagram.svg' alt='Instagram' width={24} height={24} />
               </Link>
               <Link
                 href='https://wa.me/584248719024'
@@ -51,7 +51,7 @@ function Footer() {
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                <Image src='/whatsapp.svg' alt='WhatsApp' width={24} height={24} className='filter invert sepia-0 saturate-0 brightness-100 contrast-100' />
+                <Image src='/whatsapp.svg' alt='WhatsApp' width={24} height={24} />
               </Link>
               <Link
                 href='https://www.tiktok.com/@jirvinflores'
@@ -59,7 +59,7 @@ function Footer() {
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                <Image src='/tiktok.svg' alt='TikTok' width={24} height={24} className='filter invert sepia-0 saturate-0 brightness-100 contrast-100' />
+                <Image src='/tiktok.svg' alt='TikTok' width={24} height={24} />
               </Link>
             </div>
           </div>
