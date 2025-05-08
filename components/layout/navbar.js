@@ -72,7 +72,7 @@ const Navbar = () => {
               <span className="text-sm">Mi Cuenta</span>
             </Link>
             <Link 
-              href="/comprar" 
+              href="/rifas" 
               className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black font-medium py-2 px-4 rounded-md transition-all duration-300 flex items-center"
             >
               <Gift className="h-4 w-4 mr-2" />
